@@ -433,7 +433,7 @@ class VC:
                         audio_opt,
                         self.tgt_sr,
                     )
-                    print(f"💾 Generated audio saved to: {current_output_path}")
+                    print(f"💾 VOX Generated audio saved to: {current_output_path}")
                 else:
                     with BytesIO() as wavf:
                         sf.write(
@@ -445,14 +445,14 @@ class VC:
                         wavf.seek(0, 0)
                         with open(current_output_path, "wb") as outf:
                                 wav2(wavf, outf, format1)
-                    print(f"💾 Generated audio saved to: {current_output_path}")
+                    print(f"💾 VOX Generated audio saved to: {current_output_path}")
             except:
                 info = traceback.format_exc()
             return (
                 "Success.\n%s\nTime:\nnpy: %.2fs, f0: %.2fs, infer: %.2fs."
                 % (index_info, *times),
                 (tgt_sr, audio_opt),
-                current_output_path,
+                current_output_path
             )
         except:
             info = traceback.format_exc()

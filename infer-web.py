@@ -2229,6 +2229,7 @@ def GradioSetup():
                                 "Export audio (click on the three dots in the lower right corner to download)"
                             )
                         )
+                        vc_output3 = gr.Textbox(label="Output Saved to:")
 
                     with gr.Group():  # I think this defines the big convert button
                         with gr.Row():
@@ -2256,7 +2257,7 @@ def GradioSetup():
                                     maxpitch_txtbox,
                                     f0_autotune,
                                 ],
-                                [vc_output1, vc_output2],
+                                [vc_output1, vc_output2, vc_output3],
                                 api_name="infer_convert",
                             )
 

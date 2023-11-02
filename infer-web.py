@@ -123,6 +123,7 @@ os.makedirs(tmp, exist_ok=True)
 os.makedirs(os.path.join(now_dir, "logs"), exist_ok=True)
 os.makedirs(os.path.join(now_dir, "logs/weights"), exist_ok=True)
 os.environ["temp"] = tmp
+os.environ["tmp"] = tmp
 warnings.filterwarnings("ignore")
 torch.manual_seed(114514)
 logging.getLogger("numba").setLevel(logging.WARNING)
@@ -366,7 +367,7 @@ def uvr(
     infos = []
     if architecture == "VR":
         try:
-            
+
             inp_root = inp_root.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
             save_root_vocal = (
                 save_root_vocal.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
@@ -380,7 +381,7 @@ def uvr(
                 return ""
             else:
                 pass
-            
+
             infos.append(
                 i18n("Starting audio conversion... (This might take a moment)")
             )
@@ -1213,7 +1214,7 @@ def click_train(
         p = Popen(cmd.replace(f"-bs {batch_size12}", f"-bs {batchSize}"), shell=True, cwd=now_dir)
         PID = p.pid
         p.wait()
-        
+
     return (
         i18n("Training is done, check train.log"),
         {"visible": False, "__type__": "update"},
@@ -1988,7 +1989,7 @@ def GradioSetup():
                                     interactive=True,
                                     visible=False,
                                 )
-                 
+
 
                                 minpitch_slider = gr.Slider(
                                     label=i18n("Min pitch:"),

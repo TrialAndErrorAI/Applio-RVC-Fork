@@ -173,7 +173,7 @@ class VC:
             if to_return_protect
             else {"visible": False, "maximum": n_spk, "__type__": "update"}
         )
-    
+
 
     def vc_single(
         self,
@@ -203,7 +203,7 @@ class VC:
         start_time = time.time()
         if not input_audio_path1:
             return "You need to upload an audio", None
-        
+
         if (not os.path.exists(input_audio_path1)) and (not os.path.exists(os.path.join(now_dir, input_audio_path1))):
             return "Audio was not properly selected or doesn't exist", None
         if split_audio:
@@ -235,7 +235,7 @@ class VC:
                 else:
                     f0_min = f0_min or 50
                     f0_max = f0_max or 1100
-                
+
                 try:
                     dir_path = (
                         new_dir_path.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
@@ -266,10 +266,10 @@ class VC:
                             resample_sr,
                             rms_mix_rate,
                             protect,
-                            crepe_hop_length, 
-                            f0_min, 
-                            note_min, 
-                            f0_max, 
+                            crepe_hop_length,
+                            f0_min,
+                            note_min,
+                            f0_max,
                             note_max,
                             f0_autotune,
                         )
@@ -324,7 +324,7 @@ class VC:
                 % (index_info, total_time),
                 merged_audio_path,
                 )
-    
+
         print(f"\nStarting inference for '{os.path.basename(input_audio_path1)}'")
         f0_up_key = int(f0_up_key)
         if rvc_globals.NotesOrHertz and f0_method != 'rmvpe':
@@ -342,7 +342,7 @@ class VC:
                                DoFormant=rvc_globals.DoFormant,
                                Quefrency=rvc_globals.Quefrency,
                                Timbre=rvc_globals.Timbre)
-            
+
             audio_max = np.abs(audio).max() / 0.95
             if audio_max > 1:
                 audio /= audio_max
@@ -357,7 +357,7 @@ class VC:
                 message = "Model was not properly selected"
                 print(message)
                 return message, None
-            
+
             file_index = (
                 (
                     file_index.strip(" ")
@@ -419,7 +419,7 @@ class VC:
             opt_root = "assets/audios/audio-outputs"
             os.makedirs(opt_root, exist_ok=True)
             output_count = 1
-            
+
             while True:
                 opt_filename = f"generated_audio_{output_count}.{format1}"
                 current_output_path = os.path.join(opt_root, opt_filename)
@@ -452,6 +452,7 @@ class VC:
                 "Success.\n%s\nTime:\nnpy: %.2fs, f0: %.2fs, infer: %.2fs."
                 % (index_info, *times),
                 (tgt_sr, audio_opt),
+                current_output_path,
             )
         except:
             info = traceback.format_exc()
@@ -484,10 +485,10 @@ class VC:
         start_time = time.time()
         if not input_audio_path1:
             return "You need to upload an audio", None
-        
+
         if (not os.path.exists(input_audio_path1)) and (not os.path.exists(os.path.join(now_dir, input_audio_path1))):
             return "Audio was not properly selected or doesn't exist", None
-        
+
         print(f"\nStarting inference for '{os.path.basename(input_audio_path1)}'")
         f0_up_key = int(f0_up_key)
         if rvc_globals.NotesOrHertz and f0_method != 'rmvpe':
@@ -505,7 +506,7 @@ class VC:
                                DoFormant=rvc_globals.DoFormant,
                                Quefrency=rvc_globals.Quefrency,
                                Timbre=rvc_globals.Timbre)
-            
+
             audio_max = np.abs(audio).max() / 0.95
             if audio_max > 1:
                 audio /= audio_max
@@ -520,7 +521,7 @@ class VC:
                 message = "Model was not properly selected"
                 print(message)
                 return message, None
-            
+
             file_index = (
                 (
                     file_index.strip(" ")
@@ -661,10 +662,10 @@ class VC:
                     resample_sr,
                     rms_mix_rate,
                     protect,
-                    crepe_hop_length, 
-                    f0_min, 
-                    note_min, 
-                    f0_max, 
+                    crepe_hop_length,
+                    f0_min,
+                    note_min,
+                    f0_max,
                     note_max,
                     f0_autotune,
                 )

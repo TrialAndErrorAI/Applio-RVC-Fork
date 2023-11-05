@@ -211,7 +211,7 @@ def download_from_url(url):
             os.chdir(zips_path)
             if "/blob/" in url:
                 url = url.replace("/blob/", "/resolve/")
-            
+
             response = requests.get(url, stream=True)
             if response.status_code == 200:
                 file_name = url.split("/")[-1]
@@ -341,7 +341,7 @@ def download_from_url(url):
                 os.chdir(file_path)
                 print(e)
                 return None
-            
+
 
         # Fix points in the zips
         for currentPath, _, zipFiles in os.walk(zips_path):
@@ -470,7 +470,7 @@ def extract_and_show_progress(zipfile_path, unzips_path):
     except Exception as e:
         print(f"Error al descomprimir {zipfile_path}: {e}")
         return False
-    
+
 
 def load_downloaded_model(url):
     parent_path = find_folder_parent(now_dir, "assets")
@@ -517,7 +517,7 @@ def load_downloaded_model(url):
                     "logs",
                     os.path.normpath(str(model_name).replace(".zip", "")),
                 )
-                
+
                 yield "\n".join(infos)
                 success = extract_and_show_progress(zipfile_path, unzips_path)
                 if success:
@@ -533,6 +533,8 @@ def load_downloaded_model(url):
 
         index_file = False
         model_file = False
+        model_file_path = None
+        index_file_path = None
 
         for path, subdirs, files in os.walk(unzips_path):
             for item in files:
@@ -541,6 +543,7 @@ def load_downloaded_model(url):
                     model_file = True
                     model_name = item.replace(".pth", "")
                     logs_dir = os.path.join(parent_path, "logs", model_name)
+                    model_file_path = os.path.join(weights_path, item)
                     if os.path.exists(logs_dir):
                         shutil.rmtree(logs_dir)
                     os.mkdir(logs_dir)
@@ -558,6 +561,7 @@ def load_downloaded_model(url):
                 item_path = os.path.join(path, item)
                 if item.startswith("added_") and item.endswith(".index"):
                     index_file = True
+                    index_file_path = os.path.join(logs_dir, item)
                     if os.path.exists(item_path):
                         if os.path.exists(os.path.join(logs_dir, item)):
                             os.remove(os.path.join(logs_dir, item))
@@ -595,14 +599,17 @@ def load_downloaded_model(url):
             print(i18n("No relevant file was found to upload."))
             infos.append(i18n("No relevant file was found to upload."))
             yield "\n".join(infos)
-        
+
 
         if os.path.exists(zips_path):
             shutil.rmtree(zips_path)
         if os.path.exists(unzips_path):
             shutil.rmtree(unzips_path)
         os.chdir(parent_path)
-        return result
+        # append model and index file path to infos as json string object like {"model_file_path": "path", "index_file_path": "path"}
+        model_info = json.dumps({"model_file_path": model_file_path, "index_file_path": index_file_path})
+        infos.append(model_info)
+        return model_info
     except Exception as e:
         os.chdir(parent_path)
         if "too much use" in str(e):
@@ -798,7 +805,7 @@ def save_model(modelname, save_action):
 
         if save_action == i18n("Choose the method"):
             raise Exception("No method chosen.")
-        
+
         if save_action == i18n("Save all"):
             save_folder = os.path.join(save_folder, "manual_backup")
         elif save_action == i18n("Save D and G"):
@@ -1040,19 +1047,19 @@ def uvr(
     if response.status_code == 200:
         # Parse the response JSON
         response_data = response.json()
-        
+
         # Check the status of the response
         if response_data["status"] == "stream":
             # Extract the audio URL from the response
             audio_url = response_data["url"]
-            
+
             # Download the audio using wget
             print("Downloading audio...")
             filename = wget.download(audio_url, bar=None)
 
             # Move the downloaded file to the current directory
             shutil.move(filename, "./assets/audios/audio-downloads/" + filename)
-            
+
             print("Audio downloaded with the filename:", filename)
         else:
             print("API request succeeded, but status is not 'stream'. Status:", response_data["status"])
@@ -1085,7 +1092,7 @@ def uvr(
 
     if architecture == "VR":
         try:
-            
+
             inp_root = inp_root.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
             save_root_vocal = (
                 save_root_vocal.strip(" ").strip('"').strip("\n").strip('"').strip(" ")
@@ -1519,20 +1526,20 @@ def update_model_choices(select_value):
 
 
 def save_drop_model_pth(dropbox):
-    file_path = dropbox.name 
+    file_path = dropbox.name
     file_name = os.path.basename(file_path)
     target_path = os.path.join("logs", "weights", os.path.basename(file_path))
-    
+
     if not file_name.endswith('.pth'):
         print(i18n("The file does not have the .pth extension. Please upload the correct file."))
         return None
-    
+
     shutil.move(file_path, target_path)
     return target_path
 
 def extract_folder_name(file_name):
     match = re.search(r'nprobe_(.*?)\.index', file_name)
-    
+
     if match:
         return match.group(1)
     else:
@@ -1570,7 +1577,7 @@ def download_model():
             inputs=[model_url],
             outputs=[download_model_status_bar],
         )
-    gr.Markdown(value=i18n("You can also drop your files to load your model."))    
+    gr.Markdown(value=i18n("You can also drop your files to load your model."))
     with gr.Row():
         dropbox_pth = gr.File(label=i18n("Drag your .pth file here:"))
         dropbox_index = gr.File(label=i18n("Drag your .index file here:"))

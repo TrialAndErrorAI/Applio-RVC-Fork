@@ -493,11 +493,9 @@ def load_downloaded_model(url):
         if not download_file:
             print(i18n("The file could not be downloaded."))
             infos.append(i18n("The file could not be downloaded."))
-            yield "\n".join(infos)
         elif download_file == "downloaded":
             print(i18n("It has been downloaded successfully."))
             infos.append(i18n("It has been downloaded successfully."))
-            yield "\n".join(infos)
         elif download_file == "too much use":
             raise Exception(
                 i18n("Too many users have recently viewed or downloaded this file")
@@ -518,17 +516,16 @@ def load_downloaded_model(url):
                     os.path.normpath(str(model_name).replace(".zip", "")),
                 )
 
-                yield "\n".join(infos)
                 success = extract_and_show_progress(zipfile_path, unzips_path)
                 if success:
-                    yield f"Extracción exitosa: {model_name}"
+                    print(i18n("Extraction completed successfully."))
+                    infos.append(i18n("Extraction completed successfully."))
                 else:
-                    yield f"Fallo en la extracción: {model_name}"
-                yield "\n".join(infos)
+                    print(i18n("Unzip error."))
+                    infos.append(i18n("Unzip error."))
             else:
                 print(i18n("Unzip error."))
                 infos.append(i18n("Unzip error."))
-                yield "\n".join(infos)
                 return ""
 
         index_file = False
@@ -580,7 +577,6 @@ def load_downloaded_model(url):
                     "\n"
                     + i18n("The model works for inference, and has the .index file.")
                 )
-                yield "\n".join(infos)
             else:
                 print(
                     i18n(
@@ -593,12 +589,10 @@ def load_downloaded_model(url):
                         "The model works for inference, but it doesn't have the .index file."
                     )
                 )
-                yield "\n".join(infos)
 
         if not index_file and not model_file:
             print(i18n("No relevant file was found to upload."))
             infos.append(i18n("No relevant file was found to upload."))
-            yield "\n".join(infos)
 
 
         if os.path.exists(zips_path):
@@ -610,7 +604,6 @@ def load_downloaded_model(url):
         model_info = json.dumps({"model_file_path": model_file_path, "index_file_path": index_file_path})
         print(model_info)
         infos.append(model_info)
-        yield "\n".join(infos)
         return [model_info]
     except Exception as e:
         os.chdir(parent_path)

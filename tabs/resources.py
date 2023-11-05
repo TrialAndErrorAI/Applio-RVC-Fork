@@ -610,6 +610,7 @@ def load_downloaded_model(url):
         model_info = json.dumps({"model_file_path": model_file_path, "index_file_path": index_file_path})
         print(model_info)
         infos.append(model_info)
+        yield "\n".join(infos)
         return model_info
     except Exception as e:
         os.chdir(parent_path)

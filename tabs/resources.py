@@ -1577,7 +1577,7 @@ def download_model():
         download_button.click(
             fn=load_downloaded_model,
             inputs=[model_url],
-            outputs=[download_model_status_bar],
+            api_name="download_model_url",
         )
     gr.Markdown(value=i18n("You can also drop your files to load your model."))
     with gr.Row():

@@ -609,13 +609,10 @@ def load_downloaded_model(url):
         os.chdir(parent_path)
         if "too much use" in str(e):
             print(i18n("Too many users have recently viewed or downloaded this file"))
-            yield i18n("Too many users have recently viewed or downloaded this file")
         elif "private link" in str(e):
             print(i18n("Cannot get file from this private link"))
-            yield i18n("Cannot get file from this private link")
         else:
             print(e)
-            yield i18n("An error occurred downloading")
     finally:
         os.chdir(parent_path)
 

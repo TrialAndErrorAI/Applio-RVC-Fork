@@ -611,7 +611,7 @@ def load_downloaded_model(url):
         print(model_info)
         infos.append(model_info)
         yield "\n".join(infos)
-        return model_info
+        return [model_info]
     except Exception as e:
         os.chdir(parent_path)
         if "too much use" in str(e):
@@ -1577,6 +1577,7 @@ def download_model():
         download_button.click(
             fn=load_downloaded_model,
             inputs=[model_url],
+            outputs=[download_model_status_bar],
             api_name="download_model_url",
         )
     gr.Markdown(value=i18n("You can also drop your files to load your model."))

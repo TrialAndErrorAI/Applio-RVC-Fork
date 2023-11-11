@@ -819,7 +819,7 @@ def preprocess_dataset(trainset_dir, exp_dir, sr, n_p, dataset_path):
                 per,
             )
         )
-        print("Calling preprocess.py with command")
+        print("Calling preprocess.py with command", trainset_dir, exp_dir, sr, n_p, dataset_path)
         p = subprocess.Popen(
             cmd, shell=True, stdout=log_file, stderr=subprocess.STDOUT
         )

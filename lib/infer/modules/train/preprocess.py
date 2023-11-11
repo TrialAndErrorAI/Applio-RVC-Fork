@@ -130,11 +130,13 @@ class PreProcess:
                     p.start()
                 for i in range(n_p):
                     ps[i].join()
-        except:
+        except Exception as e:
+            print("Fail %s" % e)
             println("Fail. %s" % traceback.format_exc())
 
 
 def preprocess_trainset(inp_root, sr, n_p, exp_dir, per):
+    print("Preprocessing trainset... ", inp_root, sr, n_p, exp_dir, per)
     pp = PreProcess(sr, exp_dir, per)
     os.system('cls' if os.name == 'nt' else 'clear')
     println("Starting preprocessing...\n")

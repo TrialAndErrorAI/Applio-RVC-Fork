@@ -673,7 +673,7 @@ def load_dowloaded_dataset(url):
             if file.endswith(".zip"):
                 file_path = os.path.join(zips_path, file)
                 print("....")
-                foldername = file.replace(".zip", "").replace(" ", "").replace("-", "_")
+                foldername = file.replace(".zip", "").replace(" ", "")
                 dataset_path = os.path.join(datasets_path, foldername)
                 print(i18n("Proceeding with the extraction..."))
                 infos.append(i18n("Proceeding with the extraction..."))

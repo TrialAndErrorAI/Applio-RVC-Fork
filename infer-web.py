@@ -844,61 +844,87 @@ def preprocess_dataset(trainset_dir, exp_dir, sr, n_p, dataset_path):
 
 
 def extract_f0_feature(gpus, n_p, f0method, if_f0, exp_dir, version19, echl):
-    logger = logging.getLogger(__name__)
-    now_dir = os.getcwd()  # Assuming now_dir is the current working directory
-
-    # Check for non-ASCII characters in exp_dir
     if re.search(r"[^0-9a-zA-Z !@#$%^&\(\)_+=\-`~\[\]\{\};',.]", exp_dir):
-        raise Exception("Model name contains non-ASCII characters!")
+        raise gr.Error("Model name contains non-ASCII characters!")
+    gpus_rmvpe = gpus
+    gpus = gpus.split("-")
+    os.makedirs("%s/logs/%s" % (now_dir, exp_dir), exist_ok=True)
 
-    # Create necessary directories and log file
-    os.makedirs(f"{now_dir}/logs/{exp_dir}", exist_ok=True)
-    with open(f"{now_dir}/logs/{exp_dir}/extract_f0_feature.log", "w") as f:
-        pass
-
-    # F0 extraction logic
     if if_f0:
         if f0method != "rmvpe_gpu":
-            cmd = f'"{config.python_cmd}" lib/infer/modules/train/extract/extract_f0_print.py "{now_dir}/logs/{exp_dir}" {n_p} {f0method} {RQuote(echl)}'
+            cmd = (
+                '"%s" lib/infer/modules/train/extract/extract_f0_print.py "%s/logs/%s" %s %s %s'
+                % (config.python_cmd, now_dir, exp_dir, n_p, f0method, RQuote(echl))
+            )
             logger.info(cmd)
-            p = subprocess.Popen(cmd, shell=True, cwd=now_dir)
+            p = Popen(cmd, shell=True, cwd=now_dir)
             p.wait()
         else:
-            if gpus != "-":
-                gpus = gpus.split("-")
+            if gpus_rmvpe != "-":
+                gpus_rmvpe = gpus_rmvpe.split("-")
+                leng = len(gpus_rmvpe)
                 ps = []
-                for idx, n_g in enumerate(gpus):
-                    cmd = f'"{config.python_cmd}" lib/infer/modules/train/extract/extract_f0_rmvpe.py {len(gpus)} {idx} {n_g} "{now_dir}/logs/{exp_dir}" {config.is_half}'
+                for idx, n_g in enumerate(gpus_rmvpe):
+                    cmd = (
+                        '"%s" lib/infer/modules/train/extract/extract_f0_rmvpe.py %s %s %s "%s/logs/%s" %s '
+                        % (
+                            config.python_cmd,
+                            leng,
+                            idx,
+                            n_g,
+                            now_dir,
+                            exp_dir,
+                            config.is_half,
+                        )
+                    )
                     logger.info(cmd)
-                    p = subprocess.Popen(cmd, shell=True, cwd=now_dir)
+                    p = Popen(cmd, shell=True, cwd=now_dir)
                     ps.append(p)
+
                 for p in ps:
                     p.wait()
             else:
-                cmd = f'{config.python_cmd} lib/infer/modules/train/extract/extract_f0_rmvpe_dml.py "{now_dir}/logs/{exp_dir}"'
+                cmd = (
+                    config.python_cmd
+                    + ' lib/infer/modules/train/extract/extract_f0_rmvpe_dml.py "%s/logs/%s" '
+                    % (
+                        now_dir,
+                        exp_dir,
+                    )
+                )
                 logger.info(cmd)
-                p = subprocess.Popen(cmd, shell=True, cwd=now_dir)
+                p = Popen(cmd, shell=True, cwd=now_dir)
                 p.wait()
 
-    # Extract features for different parts in multiple processes
-    gpus = gpus.split("-")
+    leng = len(gpus)
     ps = []
     for idx, n_g in enumerate(gpus):
-        cmd = f'"{config.python_cmd}" lib/infer/modules/train/extract_feature_print.py {config.device} {len(gpus)} {idx} {n_g} "{now_dir}/logs/{exp_dir}" {version19} {config.is_half}'
+        cmd = (
+            '"%s" lib/infer/modules/train/extract_feature_print.py %s %s %s %s "%s/logs/%s" %s %s'
+            % (
+                config.python_cmd,
+                config.device,
+                leng,
+                idx,
+                n_g,
+                now_dir,
+                exp_dir,
+                version19,
+                config.is_half,
+            )
+        )
         logger.info(cmd)
-        p = subprocess.Popen(cmd, shell=True, cwd=now_dir)
+        p = Popen(cmd, shell=True, cwd=now_dir)
         ps.append(p)
 
-    # Wait for all processes to complete
     for p in ps:
         p.wait()
 
-    # Read and log the final output
-    with open(f"{now_dir}/logs/{exp_dir}/extract_f0_feature.log", "r") as f:
+    with open("%s/logs/%s/extract_f0_feature.log" % (now_dir, exp_dir), "r") as f:
         log = f.read()
-    logger.info(log)
 
-    return "Feature extraction done with exp_dir: ", exp_dir
+    logger.info(log)
+    return "Feature extraction done"
 
 
 def get_pretrained_models(path_str, f0_str, sr2):

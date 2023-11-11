@@ -1171,7 +1171,7 @@ def train_index(exp_dir1, version19):
     big_npy = big_npy[big_npy_idx]
     if big_npy.shape[0] > 2e5:
         infos.append("Trying doing kmeans %s shape to 10k centers." % big_npy.shape[0])
-        yield "\n".join(infos)
+        print(infos[-1])
         try:
             big_npy = (
                 MiniBatchKMeans(
@@ -1188,17 +1188,14 @@ def train_index(exp_dir1, version19):
             info = traceback.format_exc()
             logger.info(info)
             infos.append(info)
-            yield "\n".join(infos)
+            print(info)
 
     np.save("%s/total_fea.npy" % exp_dir, big_npy)
     n_ivf = min(int(16 * np.sqrt(big_npy.shape[0])), big_npy.shape[0] // 39)
-    # infos.append("%s,%s" % (big_npy.shape, n_ivf))
-    yield "\n".join(infos)
     index = faiss.index_factory(256 if version19 == "v1" else 768, "IVF%s,Flat" % n_ivf)
     # index = faiss.index_factory(256if version19=="v1"else 768, "IVF%s,PQ128x4fs,RFlat"%n_ivf)
     infos.append("Generating training file...")
     print("Generating training file...")
-    yield "\n".join(infos)
     index_ivf = faiss.extract_index_ivf(index)  #
     index_ivf.nprobe = 1
     index.train(big_npy)
@@ -1210,17 +1207,22 @@ def train_index(exp_dir1, version19):
 
     infos.append("Generating adding file...")
     print("Generating adding file...")
-    yield "\n".join(infos)
     batch_size_add = 8192
     for i in range(0, big_npy.shape[0], batch_size_add):
         index.add(big_npy[i : i + batch_size_add])
-    faiss.write_index(
-        index,
-        "%s/added_IVF%s_Flat_nprobe_%s_%s_%s.index"
-        % (exp_dir, n_ivf, index_ivf.nprobe, exp_dir1, version19),
+
+    index_path = "%s/added_IVF%s_Flat_nprobe_%s_%s_%s.index" % (
+        exp_dir,
+        n_ivf,
+        index_ivf.nprobe,
+        exp_dir1,
+        version19,
     )
+    faiss.write_index(index, index_path)
     infos.append("Files generated successfully!")
     print("Files generated successfully!")
+    # return feature index file path
+    return index_path
 
 
 def change_info_(ckpt_path):

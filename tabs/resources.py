@@ -656,12 +656,10 @@ def load_dowloaded_dataset(url):
         if not download_file:
             print(i18n("An error occurred downloading"))
             infos.append(i18n("An error occurred downloading"))
-            yield "\n".join(infos)
             raise Exception(i18n("An error occurred downloading"))
         elif download_file == "downloaded":
             print(i18n("It has been downloaded successfully."))
             infos.append(i18n("It has been downloaded successfully."))
-            yield "\n".join(infos)
         elif download_file == "too much use":
             raise Exception(
                 i18n("Too many users have recently viewed or downloaded this file")
@@ -679,7 +677,6 @@ def load_dowloaded_dataset(url):
                 dataset_path = os.path.join(datasets_path, foldername)
                 print(i18n("Proceeding with the extraction..."))
                 infos.append(i18n("Proceeding with the extraction..."))
-                yield "\n".join(infos)
                 shutil.unpack_archive(file_path, unzips_path, "zip")
                 if os.path.exists(dataset_path):
                     shutil.rmtree(dataset_path)
@@ -701,7 +698,6 @@ def load_dowloaded_dataset(url):
             else:
                 print(i18n("Unzip error."))
                 infos.append(i18n("Unzip error."))
-                yield "\n".join(infos)
 
         if os.path.exists(zips_path):
             shutil.rmtree(zips_path)
@@ -710,18 +706,15 @@ def load_dowloaded_dataset(url):
 
         print(i18n("The Dataset has been loaded successfully."))
         infos.append(i18n("The Dataset has been loaded successfully."))
-        yield "\n".join(infos)
+        return foldername
     except Exception as e:
         os.chdir(parent_path)
         if "too much use" in str(e):
             print(i18n("Too many users have recently viewed or downloaded this file"))
-            yield i18n("Too many users have recently viewed or downloaded this file")
         elif "private link" in str(e):
             print(i18n("Cannot get file from this private link"))
-            yield i18n("Cannot get file from this private link")
         else:
             print(e)
-            yield i18n("An error occurred downloading")
     finally:
         os.chdir(parent_path)
 

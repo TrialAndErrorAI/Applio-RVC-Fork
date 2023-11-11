@@ -795,49 +795,52 @@ def update_fshift_presets(preset, qfrency, tmbre):
 def preprocess_dataset(trainset_dir, exp_dir, sr, n_p, dataset_path):
     if re.search(r"[^0-9a-zA-Z !@#$%^&\(\)_+=\-`~\[\]\{\};',.]", exp_dir):
         raise gr.Error("Model name contains non-ASCII characters!")
+
     if not dataset_path.strip() == "":
         trainset_dir = dataset_path
     else:
         trainset_dir = os.path.join(now_dir, "datasets", trainset_dir)
+
     sr = sr_dict[sr]
     os.makedirs("%s/logs/%s" % (now_dir, exp_dir), exist_ok=True)
-    f = open("%s/logs/%s/preprocess.log" % (now_dir, exp_dir), "w")
-    f.close()
-    per = 3.0 if config.is_half else 3.7
-    cmd = (
-        '"%s" lib/infer/modules/train/preprocess.py "%s" %s %s "%s/logs/%s" %s %.1f'
-        % (
-            config.python_cmd,
-            trainset_dir,
-            sr,
-            n_p,
-            now_dir,
-            exp_dir,
-            config.noparallel,
-            per,
+    log_file_path = "%s/logs/%s/preprocess.log" % (now_dir, exp_dir)
+    with open(log_file_path, "w") as log_file:
+        per = 3.0 if config.is_half else 3.7
+        cmd = (
+            '"%s" lib/infer/modules/train/preprocess.py "%s" %s %s "%s/logs/%s" %s %.1f'
+            % (
+                config.python_cmd,
+                trainset_dir,
+                sr,
+                n_p,
+                now_dir,
+                exp_dir,
+                config.noparallel,
+                per,
+            )
         )
-    )
-    logger.info(cmd)
-    p = Popen(cmd, shell=True)  # , stdin=PIPE, stdout=PIPE,stderr=PIPE,cwd=now_dir
-    ###煞笔gr, popen read都非得全跑完了再一次性读取, 不用gr就正常读一句输出一句;只能额外弄出一个文本流定时读
-    done = [False]
-    threading.Thread(
-        target=if_done,
-        args=(
-            done,
-            p,
-        ),
-    ).start()
-    while 1:
-        with open("%s/logs/%s/preprocess.log" % (now_dir, exp_dir), "r") as f:
-            yield (f.read())
-        sleep(1)
-        if done[0]:
-            break
-    with open("%s/logs/%s/preprocess.log" % (now_dir, exp_dir), "r") as f:
-        log = f.read()
-    logger.info(log)
-    yield log
+        print("Calling preprocess.py with command")
+        p = subprocess.Popen(
+            cmd, shell=True, stdout=log_file, stderr=subprocess.STDOUT
+        )
+        done = [False]
+
+        def if_done(done_flag, process):
+            process.wait()
+            done_flag[0] = True
+
+        threading.Thread(
+            target=if_done,
+            args=(
+                done,
+                p,
+            ),
+        ).start()
+        while not done[0]:
+            time.sleep(1)
+
+    print("Process done with datasetpath: ", dataset_path)
+    return trainset_dir
 
 
 def extract_f0_feature(gpus, n_p, f0method, if_f0, exp_dir, version19, echl):

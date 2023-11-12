@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+import time
 import gdown
 import errno
 import json
@@ -1008,12 +1009,12 @@ def uvr(
 
     # Define the request body as a Python dictionary
     request_body = {
-        "url": input_url,  # Replace with the actual URL of the video
-        "vCodec": "h264",           # Video codec (h264, av1, vp9)
-        "vQuality": "720",          # Video quality (e.g., 720)
-        "aFormat": "wav",           # Audio format (mp3, ogg, wav, opus)
-        "isAudioOnly": True,        # Set to True to extract audio only
-        "isAudioMuted": False,      # Set to True to disable audio in video
+        "url": input_url,              # Replace with the actual URL of the video
+        "vCodec": "h264",              # Video codec (h264, av1, vp9)
+        "vQuality": "720",             # Video quality (e.g., 720)
+        "aFormat": "wav",              # Audio format (mp3, ogg, wav, opus)
+        "isAudioOnly": True,           # Set to True to extract audio only
+        "isAudioMuted": False,         # Set to True to disable audio in video
     }
 
     # Convert the request body dictionary to JSON
@@ -1022,14 +1023,37 @@ def uvr(
     # Set the headers including the "Accept" header
     headers = {
         "Content-Type": "application/json",  # Specify the content type as JSON
-        "Accept": "application/json"        # Specify that you accept JSON responses
+        "Accept": "application/json"         # Specify that you accept JSON responses
     }
 
-    # Send the POST request to the API with headers
-    response = requests.post(api_url, data=request_body_json, headers=headers)
+    # Number of retries
+    max_retries = 5
+
+    # Initialize response variable
+    response = None
+    filename = None
+
+    # Retry loop
+    for attempt in range(max_retries):
+        try:
+            # Send the POST request to the API with headers
+            response = requests.post(api_url, data=request_body_json, headers=headers)
+
+            # If the response status code is 200, break out of the loop
+            if response.status_code == 200:
+                print(f"Audio download request succeeded.")
+                break
+            else:
+                print(f"Received 400 response, retrying... (Attempt {attempt + 1}/{max_retries})")
+
+            # Wait for 1 second before retrying
+            time.sleep(1)
+        except Exception as e:
+            print("An error occurred:", e)
+            break
 
     # Check if the request was successful (status code 200)
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         # Parse the response JSON
         response_data = response.json()
 
@@ -1049,7 +1073,12 @@ def uvr(
         else:
             print("API request succeeded, but status is not 'stream'. Status:", response_data["status"])
     else:
-        print("API request failed with status code:", response.status_code)
+        print("Failed to download audio after several attempts.")
+
+    if filename is None:
+        raise Exception("Failed to download audio.")
+
+
 
     filename_ext = os.path.splitext(filename)[0]
 

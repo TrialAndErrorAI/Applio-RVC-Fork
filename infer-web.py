@@ -3007,7 +3007,7 @@ def GradioRun(app):
     max_size = 1022
 
     if config.iscolab or config.paperspace:
-        app.queue(concurrency_count=1, max_size=max_size).launch(
+        app.queue(concurrency_count=2, max_size=max_size).launch(
             server_name="0.0.0.0",
             inbrowser=not config.noautoopen,
             server_port=config.listen_port,

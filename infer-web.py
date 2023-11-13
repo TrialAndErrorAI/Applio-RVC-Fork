@@ -1888,7 +1888,7 @@ def GradioSetup() -> gr.Blocks:
                     with gr.Column(
                         visible=False
                     ) as advanced_settings:  # Initially hidden
-                        with gr.Row(label=i18n("Advanced Settings"), open=False):
+                        with gr.Row():
                             with gr.Column():
                                 f0method0 = gr.Radio(
                                     label=i18n(

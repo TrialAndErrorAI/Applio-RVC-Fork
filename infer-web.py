@@ -2566,6 +2566,7 @@ def GradioSetup():
                         ],
                         [info2],
                         api_name="train_extract_f0_feature",
+                        queue=True
                     )
 
                 with gr.Row():
@@ -2782,6 +2783,7 @@ def GradioSetup():
                             ],
                             [info3, butstop, but3],
                             api_name="train_start",
+                            queue=True,
                         )
 
                         but4.click(train_index, [exp_dir1, version19], info3)

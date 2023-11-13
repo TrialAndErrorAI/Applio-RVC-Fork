@@ -1839,7 +1839,7 @@ def GradioSetup() -> gr.Blocks:
                         with gr.Column():  # First column for audio-related inputs
                             dropbox = gr.File(label=i18n("Drag your audio here:"))
                             record_button = gr.Audio(
-                                source="microphone",
+                                sources=['microphone'],
                                 label=i18n("Or record an audio:"),
                                 type="filepath",
                             )

@@ -7,6 +7,8 @@ datasets/*
 logs/*
 assets/audios/
 
+.venv
+
 assets/rmvpe/rmvpe.pt
 assets/rmvpe/rmvpe.onnx
 assets/hubert/hubert_base.pt

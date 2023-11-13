@@ -2171,9 +2171,7 @@ def GradioSetup() -> gr.Blocks:
                         outputs=[advanced_settings],
                     )
 
-                    but0 = gr.Button(i18n("Convert"), variant="primary").style(
-                        full_width=True
-                    )
+                    but0 = gr.Button(i18n("Convert"), variant="primary")
 
                     with gr.Row():  # Defines output info + output audio download after conversion
                         vc_output1 = gr.Textbox(label=i18n("Output information:"))

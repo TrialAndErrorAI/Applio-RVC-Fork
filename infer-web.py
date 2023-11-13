@@ -2257,9 +2257,7 @@ def GradioSetup() -> gr.Blocks:
                             with gr.Row(
                                 visible=False
                             ) as advanced_settings_batch:  # Initially hidden
-                                with gr.Row(
-                                    label=i18n("Advanced Settings"), open=False
-                                ):
+                                with gr.Row():
                                     with gr.Column():
                                         file_index3 = gr.Textbox(
                                             label=i18n(

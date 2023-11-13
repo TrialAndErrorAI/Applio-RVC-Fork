@@ -97,7 +97,7 @@ def combine_and_save_audios(
 ):
     audio1 = AudioSegment.from_file(audio1_path)
     audio2 = AudioSegment.from_file(audio2_path)
-    
+
     # Verificar cuál audio tiene mayor longitud
     if len(audio1) > len(audio2):
         # Calcular la diferencia en duración en segundos
@@ -222,11 +222,11 @@ def process_audio(file_path):
 
             print(f"Segment {i} created!")
             segment_count += 1
-            
+
             # write start times to file
             with open(timestamps_file, "a", encoding="utf-8") as f:
                 f.write(f"{chunk_file_path} starts at {start_i} ms\n")
-        
+
         print(f"Total segments created: {segment_count}")
         print(f"Split all chunks for {file_path} successfully!")
 
@@ -346,12 +346,10 @@ def merge_audios():
                     interactive=True,
                 )
                 with gr.Row():
-                    butnone = gr.Button(i18n("Merge"), variant="primary").style(
-                        full_width=True
-                    )
+                    butnone = gr.Button(i18n("Merge"), variant="primary")
                     refresh_button = gr.Button(
                         i18n("Refresh"), variant="primary"
-                    ).style(full_width=True)
+                    )
 
                 vc_output1 = gr.Textbox(label=i18n("Output information:"))
                 vc_output2 = gr.Audio(

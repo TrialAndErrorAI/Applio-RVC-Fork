@@ -1649,8 +1649,6 @@ def download_dataset(trainset_dir4):
             fn=load_dowloaded_dataset,
             inputs=[dataset_url],
             outputs=[load_dataset_status_bar],
-            concurrency_limit=1,
-            queue=True
         )
         load_dataset_status_bar.change(update_dataset_list, dataset_url, trainset_dir4)
 

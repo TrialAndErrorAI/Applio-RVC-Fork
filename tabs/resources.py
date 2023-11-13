@@ -1683,15 +1683,13 @@ def audio_downloader_separator():
         )
     )
     with gr.Row():
-        input_url = gr.inputs.Textbox(label=i18n("Enter the Video or Audio link:"))
+        input_url = gr.Textbox(label=i18n("Enter the Video or Audio link:"))
         advanced_settings_checkbox = gr.Checkbox(
             value=False,
             label=i18n("Advanced Settings"),
             interactive=True,
         )
-    with gr.Row(
-        label=i18n("Advanced Settings"), visible=False, variant="compact"
-    ) as advanced_settings:
+    with gr.Row(variant="compact") as advanced_settings:
         with gr.Column():
             model_select = gr.Radio(
                 label=i18n("Model Architecture:"),

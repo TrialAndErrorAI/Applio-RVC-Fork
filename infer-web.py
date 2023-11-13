@@ -31,6 +31,7 @@ import subprocess
 logging.getLogger("faiss").setLevel(logging.WARNING)
 import faiss
 import gradio as gr
+
 import numpy as np
 import torch as torch
 import regex as re
@@ -1787,7 +1788,7 @@ else:
     my_applio = "JohnSmith9982/small_and_pretty"
 
 
-def GradioSetup():
+def GradioSetup() -> gr.Blocks:
     default_weight = ""
 
     with gr.Blocks(theme=my_applio, title="Applio-RVC-Fork") as app:
@@ -2553,6 +2554,7 @@ def GradioSetup():
                             interactive=False,
                         )
 
+
                     but2.click(
                         extract_f0_feature,
                         [
@@ -2566,7 +2568,8 @@ def GradioSetup():
                         ],
                         [info2],
                         api_name="train_extract_f0_feature",
-                        queue=True
+                        queue=True,
+                        concurrency_limit=1,
                     )
 
                 with gr.Row():
@@ -2784,6 +2787,7 @@ def GradioSetup():
                             [info3, butstop, but3],
                             api_name="train_start",
                             queue=True,
+                            concurrency_limit=1,
                         )
 
                         but4.click(train_index, [exp_dir1, version19], info3)
@@ -3001,13 +3005,13 @@ def GradioSetup():
         return app
 
 
-def GradioRun(app):
+def GradioRun(app: gr.Blocks):
     share_gradio_link = config.iscolab or config.paperspace
     concurrency_count = 511
     max_size = 1022
 
     if config.iscolab or config.paperspace:
-        app.queue(concurrency_count=2, max_size=max_size).launch(
+        app.queue(max_size=max_size).launch(
             server_name="0.0.0.0",
             inbrowser=not config.noautoopen,
             server_port=config.listen_port,

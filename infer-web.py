@@ -3010,15 +3010,14 @@ def GradioRun(app: gr.Blocks):
         app.queue(max_size=max_size).launch(
             server_name="0.0.0.0",
             inbrowser=not config.noautoopen,
-            server_port=config.listen_port,
+            server_port=8081,
             quiet=True,
-            favicon_path="./assets/images/icon.png",
-        )
+            favicon_path="./assets/images/icon.png"        )
     else:
         app.queue(concurrency_count=concurrency_count, max_size=max_size).launch(
             server_name="0.0.0.0",
             inbrowser=not config.noautoopen,
-            server_port=config.listen_port,
+            server_port=8081,
             quiet=True,
             favicon_path="./assets/images/icon.png",
         )

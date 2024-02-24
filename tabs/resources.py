@@ -22,6 +22,8 @@ from lib.infer.modules.uvr5.mdxprocess import (
 import requests
 import wget
 import ffmpeg
+from urllib.parse import unquote
+import random
 import hashlib
 current_script_path = os.path.abspath(__file__)
 script_parent_directory = os.path.dirname(current_script_path)
@@ -1064,12 +1066,27 @@ def uvr(
 
             # Download the audio using wget
             print("Downloading audio...")
-            filename = wget.download(audio_url, bar=None)
+            filename = ""
 
-            # Move the downloaded file to the current directory
-            shutil.move(filename, "./assets/audios/audio-downloads/" + filename)
+            responseAudio = requests.get(audio_url, stream=True)
+            if response.status_code == 200:
+                content_disposition = response.headers.get('Content-Disposition')
+                if content_disposition:
+                    filename = unquote(content_disposition.split('filename=')[1].strip('"'))
+                else:
+                    # need a temp random filename
+                    filename = f"audio_{random.randint(1000, 9999)}.wav"
 
-            print("Audio downloaded with the filename:", filename)
+                newPath = os.path.join('./assets/audios/audio-downloads/', filename)
+
+                with open(newPath, 'wb') as f:
+                    for chunk in responseAudio.iter_content(1024):
+                        f.write(chunk)
+
+                print(f"Audio downloaded successfully. Saved as: {newPath}")
+            else:
+                raise Exception("Failed to download audio after several attempts.")
+
         else:
             print("API request succeeded, but status is not 'stream'. Status:", response_data["status"])
     else:

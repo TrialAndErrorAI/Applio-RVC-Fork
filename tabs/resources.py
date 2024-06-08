@@ -1036,8 +1036,8 @@ def uvr(
     instrumental_directory = os.path.join(actual_directory, save_root_ins)
     audio_downloads_directory = os.path.join(actual_directory, inp_root)
 
-    vocal_formatted = f"vocal_{filename}.reformatted.wav_10.wav"
-    instrumental_formatted = f"instrument_{filename}.reformatted.wav_10.wav"
+    vocal_formatted = f"vocal_{filename}"
+    instrumental_formatted = f"instrument_{filename}"
 
     vocal_audio_path = os.path.join(vocal_directory, vocal_formatted)
     instrumental_audio_path = os.path.join(
@@ -1074,7 +1074,7 @@ def uvr(
                 pass
 
             print(
-                i18n("Starting audio conversion... (This might take a moment)")
+                i18n("Starting audio conversion VR... (This might take a moment)")
             )
 
             if model_name == "onnx_dereverb_By_FoxJoy":
@@ -1166,7 +1166,7 @@ def uvr(
     elif architecture == "MDX":
         try:
             print(
-                i18n("Starting audio conversion... (This might take a moment)")
+                i18n("Starting audio conversion MDX... (This might take a moment)")
             )
             inp_root, save_root_vocal, save_root_ins = [
                 x.strip(" ").strip('"').strip("\n").strip('"').strip(" ")

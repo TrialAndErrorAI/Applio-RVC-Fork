@@ -1036,8 +1036,8 @@ def uvr(
     instrumental_directory = os.path.join(actual_directory, save_root_ins)
     audio_downloads_directory = os.path.join(actual_directory, inp_root)
 
-    vocal_formatted = f"vocal_{filename}"
-    instrumental_formatted = f"instrument_{filename}"
+    vocal_formatted = f"vocal_{filename}_10.wav"
+    instrumental_formatted = f"instrument_{filename}_10.wav"
 
     vocal_audio_path = os.path.join(vocal_directory, vocal_formatted)
     instrumental_audio_path = os.path.join(

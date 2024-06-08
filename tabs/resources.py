@@ -1020,7 +1020,10 @@ def uvr(
 
     # Download the audio stream
     print("Downloading audio...")
-    filename = audio_stream.download(output_path='./assets/audios/audio-downloads')
+    output_path = os.path.join(os.getcwd(), "assets/audios/audio-downloads")
+    filename = audio_stream.download(output_path=output_path)
+    # get only the filename
+    filename = os.path.basename(filename)
 
     print(f"Audio downloaded successfully. Saved as: {filename}")
 

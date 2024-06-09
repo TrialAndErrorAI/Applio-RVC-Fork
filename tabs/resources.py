@@ -982,8 +982,8 @@ def change_choices2():
         "__type__": "update"
     }
 
+# from pytube import YouTube
 
-from pytube import YouTube
 
 def uvr(
     input_url,
@@ -1009,23 +1009,111 @@ def uvr(
     #     os.mkdir(carpeta_a_eliminar)
 
     # Define the API endpoint URL
-    # Define the YouTube video URL
-    youtube_url = input_url
+    api_url = "https://co.wuk.sh/api/json"  # Update the URL if necessary
 
-    # Create a YouTube object
-    yt = YouTube(youtube_url)
+    # Define the request body as a Python dictionary
+    request_body = {
+        "url": input_url,              # Replace with the actual URL of the video
+        "vCodec": "h264",              # Video codec (h264, av1, vp9)
+        "vQuality": "720",             # Video quality (e.g., 720)
+        "aFormat": "wav",              # Audio format (mp3, ogg, wav, opus)
+        "isAudioOnly": True,           # Set to True to extract audio only
+        "isAudioMuted": False,         # Set to True to disable audio in video
+    }
 
-    # Get the highest resolution audio stream
-    audio_stream = yt.streams.get_audio_only()
+    # Convert the request body dictionary to JSON
+    request_body_json = json.dumps(request_body)
 
-    # Download the audio stream
-    print("Downloading audio...")
-    output_path = os.path.join(os.getcwd(), "assets/audios/audio-downloads")
-    filename = audio_stream.download(output_path=output_path)
-    # get only the filename
-    filename = os.path.basename(filename)
+    # Set the headers including the "Accept" header
+    headers = {
+        "Content-Type": "application/json",  # Specify the content type as JSON
+        "Accept": "application/json"         # Specify that you accept JSON responses
+    }
 
-    print(f"Audio downloaded successfully. Saved as: {filename}")
+    # Number of retries
+    max_retries = 5
+
+    # Initialize response variable
+    response = None
+    filename = None
+
+    # Retry loop
+    for attempt in range(max_retries):
+        try:
+            # Send the POST request to the API with headers
+            response = requests.post(api_url, data=request_body_json, headers=headers)
+
+            # If the response status code is 200, break out of the loop
+            if response.status_code == 200:
+                print(f"Audio download request succeeded.")
+                break
+            else:
+                print(f"Received 400 response, retrying... (Attempt {attempt + 1}/{max_retries})")
+
+            # Wait for 1 second before retrying
+            time.sleep(1)
+        except Exception as e:
+            print("An error occurred:", e)
+            break
+
+    # Check if the request was successful (status code 200)
+    if response and response.status_code == 200:
+        # Parse the response JSON
+        response_data = response.json()
+
+        # Check the status of the response
+        if response_data["status"] == "stream":
+            # Extract the audio URL from the response
+            audio_url = response_data["url"]
+
+            # Download the audio using wget
+            print("Downloading audio...")
+            filename = ""
+
+            responseAudio = requests.get(audio_url, stream=True)
+            if response.status_code == 200:
+                content_disposition = response.headers.get('Content-Disposition')
+                if content_disposition:
+                    filename = unquote(content_disposition.split('filename=')[1].strip('"'))
+                else:
+                    # need a temp random filename
+                    filename = f"audio_{random.randint(1000, 9999)}.wav"
+
+                newPath = os.path.join('./assets/audios/audio-downloads/', filename)
+
+                with open(newPath, 'wb') as f:
+                    for chunk in responseAudio.iter_content(1024):
+                        f.write(chunk)
+
+                print(f"Audio downloaded successfully. Saved as: {newPath}")
+            else:
+                raise Exception("Failed to download audio after several attempts.")
+
+        else:
+            print("API request succeeded, but status is not 'stream'. Status:", response_data["status"])
+    else:
+        print("Failed to download audio after several attempts.")
+
+    if filename is None:
+        raise Exception("Failed to download audio.")
+
+    # youtube_url = input_url
+
+    # # Create a YouTube object
+    # yt = YouTube(youtube_url)
+
+    # # Get the highest resolution audio stream
+    # audio_stream = yt.streams.get_audio_only()
+
+    # # Download the audio stream
+    # print("Downloading audio...")
+    # output_path = os.path.join(os.getcwd(), "assets/audios/audio-downloads")
+    # filename = audio_stream.download(output_path=output_path)
+    # # get only the filename
+    # filename = os.path.basename(filename)
+
+    # print(f"Audio downloaded successfully. Saved as: {filename}")
+
 
     filename_ext = os.path.splitext(filename)[0]
 
@@ -1036,8 +1124,11 @@ def uvr(
     instrumental_directory = os.path.join(actual_directory, save_root_ins)
     audio_downloads_directory = os.path.join(actual_directory, inp_root)
 
-    vocal_formatted = f"vocal_{filename}_10.wav"
-    instrumental_formatted = f"instrument_{filename}_10.wav"
+    vocal_formatted = f"vocal_{filename}.reformatted.wav_10.wav"
+    instrumental_formatted = f"instrument_{filename}.reformatted.wav_10.wav"
+
+    #     vocal_formatted = f"vocal_{filename}_10.wav"
+    #     instrumental_formatted = f"instrument_{filename}_10.wav"
 
     vocal_audio_path = os.path.join(vocal_directory, vocal_formatted)
     instrumental_audio_path = os.path.join(

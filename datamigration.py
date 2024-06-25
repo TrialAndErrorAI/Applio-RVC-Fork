@@ -82,10 +82,10 @@ def parallel_uploads(index_files):
   end_time = time.time()
   print(f"Parallel uploads completed in {end_time - start_time} seconds")
 
-if __name__ == '__main__':
-  main()
-
 def main():
   files = get_files()
   index_files = get_index_files(files)
   parallel_uploads(index_files)
+  
+if __name__ == '__main__':
+  main()

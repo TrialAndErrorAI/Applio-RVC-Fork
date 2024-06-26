@@ -23,8 +23,11 @@ def upload_file_to_r2(filePath, filename):
     print(f"File {filename} upload failed, Response: {rs}")
   else:
     print(f"File {filename} uploaded successfully")
-        
+
 def main():
-    local_file = 'pretrained_v2.zip'
-    s3_file = 'pretrained_v2.zip'
-    upload_file_to_r2(local_file, bucket, s3_file)
+  local_file = 'pretrained_v2.zip'
+  s3_file = 'pretrained_v2.zip'
+  upload_file_to_r2(local_file, s3_file)
+
+if __name__ == "__main__":
+  main()

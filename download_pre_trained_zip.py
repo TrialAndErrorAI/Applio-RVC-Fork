@@ -1,5 +1,6 @@
 import os
 import boto3
+from botocore.client import Config
 from dataplane import s3_upload
 
 S3Connect = boto3.client('s3', 
